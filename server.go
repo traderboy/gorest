@@ -15,14 +15,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
-	//"github.com/garyburd/redigo/redis"
-	//"github.com/go-ozzo/ozzo-routing"
-	//"github.com/go-ozzo/ozzo-routing/access"
-	//"github.com/go-ozzo/ozzo-routing/content"
-	//"github.com/go-ozzo/ozzo-routing/fault"
-	//"github.com/go-ozzo/ozzo-routing/file"
-	//"github.com/go-ozzo/ozzo-routing/slash"
-	//"gopkg.in/redis.v4"
 )
 
 //Db is the SQLITE database object
