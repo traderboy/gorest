@@ -3,8 +3,10 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"runtime"
@@ -24,6 +26,7 @@ import (
 
 //Db is the SQLITE database object
 var Db *sql.DB
+var port = ":8080"
 
 //Person  is a single person
 type Person struct {
@@ -80,7 +83,7 @@ func InitDb() {
 	//return
 	//}
 
-	log.Println("Creating SQLite Db", "Log")
+	//log.Println("Creating SQLite Db", "Log")
 	//Db, err := sql.Open("sqlite3", "./foo.Db")
 	Db, err = sql.Open("sqlite3", ":memory:")
 	if err != nil {
@@ -93,13 +96,13 @@ func InitDb() {
 	create table heroes (id INTEGER PRIMARY KEY AUTOINCREMENT, name text);
 	delete from heroes;
 	`
-	log.Println("Executing SQLite Db", "Log")
+	//log.Println("Executing SQLite Db", "Log")
 	_, err = Db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 		return
 	}
-	log.Println("1", "Log")
+	//log.Println("1", "Log")
 	tx, err := Db.Begin()
 	if err != nil {
 		log.Fatal(err)
@@ -111,7 +114,7 @@ func InitDb() {
 	defer stmt.Close()
 	for _, k := range vals {
 		//os.Stdout.WriteString(strconv.Itoa(k.Id) + ", " + k.Name + "\n")
-		log.Println(strconv.Itoa(k.ID) + ", " + k.Name + "\n")
+		//log.Println(strconv.Itoa(k.ID) + ", " + k.Name + "\n")
 		_, err = stmt.Exec(k.ID, fmt.Sprintf("%s", k.Name))
 		if err != nil {
 			log.Fatal(err)
@@ -129,11 +132,61 @@ func InitDb() {
 	tx.Commit()
 }
 
-//print out configuration details
+//ConfigRuntime print out configuration details
 func ConfigRuntime() {
 	nuCPU := runtime.NumCPU()
 	runtime.GOMAXPROCS(nuCPU)
 	log.Printf("Running with %d CPUs\n", nuCPU)
+	host, _ := os.Hostname()
+	addrs, _ := net.LookupIP(host)
+	for _, addr := range addrs {
+		if ipv4 := addr.To4(); ipv4 != nil {
+			fmt.Println("IPv4: ", ipv4)
+		}
+	}
+	ip, err := externalIP()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Public IP: " + ip)
+
+}
+
+func externalIP() (string, error) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+	for _, iface := range ifaces {
+		if iface.Flags&net.FlagUp == 0 {
+			continue // interface down
+		}
+		if iface.Flags&net.FlagLoopback != 0 {
+			continue // loopback interface
+		}
+		addrs, err := iface.Addrs()
+		if err != nil {
+			return "", err
+		}
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+			if ip == nil || ip.IsLoopback() {
+				continue
+			}
+			ip = ip.To4()
+			if ip == nil {
+				continue // not an ipv4 address
+			}
+			return ip.String(), nil
+		}
+	}
+	return "", errors.New("are you connected to the network?")
 }
 
 //func postHeroes(c *gin.Context) {
@@ -175,7 +228,7 @@ func getHeroes(c *gin.Context) {
 //StartGin starts up gin and sets the routes
 func StartGin() {
 	/*
-		gin.SetMode(gin.ReleaseMode)
+
 		router := gin.New()
 		router.GET("/ping", func(c *gin.Context) {
 			c.JSON(200, gin.H{
@@ -183,10 +236,11 @@ func StartGin() {
 			})
 		})
 	*/
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	//router.POST("/heroes", postHeroes)
 
-	log.Println("Starting up Gin")
+	log.Println("Starting up Gin on port: " + port)
 	//router.Use(rateLimit, gin.Recovery())
 	// Creates a gin router with default middleware:
 	// logger and recovery (crash-free) middleware
@@ -273,7 +327,7 @@ func StartGin() {
 			log.Panic(err)
 		}
 
-		//fmt.Println(affect)
+		log.Println(affect)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -329,7 +383,7 @@ func StartGin() {
 			log.Panic(err)
 		}
 
-		//fmt.Println(affect)
+		log.Println(affect)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -369,7 +423,7 @@ func StartGin() {
 			log.Panic(err)
 		}
 
-		//fmt.Println(affect)
+		log.Println(affect)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -392,7 +446,7 @@ func StartGin() {
 	   router.HEAD("/someHead", head)
 	   router.OPTIONS("/someOptions", options)
 	*/
-	router.Run(":8081")
+	router.Run(port)
 
 }
 
