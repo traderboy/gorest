@@ -55,19 +55,20 @@ func main() {
 
 func OpenDb() {
 	var err error
+
 	Db, err = sql.Open("sqlite3", "./heroes.sqlite")
 	if err != nil {
 		log.Fatal(err)
-
 	}
-	rows, err := Db.Query("select count(*) from heroes")
-	if err != nil {
+	defer Db.Close()
+	rows, err1 := Db.Query("select count(*) from heroes")
+	if err1 != nil {
 		//log.Fatal(err)
 		LoadDb()
+		return
 	}
 	defer rows.Close()
 
-	//LoadDb()
 }
 
 func InitLog() {
@@ -89,8 +90,8 @@ func InitDb() {
 	Db, err = sql.Open("sqlite3", ":memory:")
 	if err != nil {
 		log.Fatal(err)
-
 	}
+	defer Db.Close()
 
 }
 func LoadDb() {
