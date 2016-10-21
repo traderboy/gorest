@@ -153,7 +153,7 @@ func getHeroes(c *gin.Context) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(id, name)
+		//log.Println(id, name)
 		p := Person{id, name}
 		heroes = append(heroes, p)
 
@@ -234,7 +234,7 @@ func StartGin() {
 	})
 
 	router.POST("/heroes", func(c *gin.Context) {
-		fmt.Println("Post")
+		//fmt.Println("Post")
 		//name := c.PostForm("")
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
@@ -253,7 +253,7 @@ func StartGin() {
 		if e != nil {
 			log.Panic(e)
 		}
-		fmt.Println("Posting id: " + cMap["name"])
+		log.Println("Posting id: " + cMap["name"])
 
 		log.Println(cMap)
 		stmt, err := Db.Prepare("INSERT INTO heroes(name) values(?)")
@@ -273,7 +273,7 @@ func StartGin() {
 			log.Panic(err)
 		}
 
-		fmt.Println(affect)
+		//fmt.Println(affect)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -310,7 +310,7 @@ func StartGin() {
 			log.Panic(err)
 		}
 
-		fmt.Println("Updating id: " + strconv.Itoa(hero.ID) + " with name=" + hero.Name)
+		log.Println("Updating id: " + strconv.Itoa(hero.ID) + " with name=" + hero.Name)
 		//return
 		stmt, err := Db.Prepare("update heroes set name=? where id=?")
 		if err != nil {
@@ -329,11 +329,11 @@ func StartGin() {
 			log.Panic(err)
 		}
 
-		fmt.Println(affect)
+		//fmt.Println(affect)
 		if err != nil {
 			log.Panic(err)
 		}
-		log.Println("Updating id " + strconv.Itoa(hero.ID))
+		//log.Println("Updating id " + strconv.Itoa(hero.ID))
 		/*
 			c.JSON(http.StatusOK, gin.H{
 				"status": "1",
@@ -344,14 +344,14 @@ func StartGin() {
 	})
 
 	router.DELETE("/heroes/:id", func(c *gin.Context) {
-		fmt.Println("Delete")
+		//fmt.Println("Delete")
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		c.Header("Access-Control-Allow-Headers",
 			"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 		c.Header("Content-Type", "application/json")
 
-		fmt.Println("Deleting id: " + c.Param("id"))
+		log.Println("Deleting id: " + c.Param("id"))
 		stmt, err := Db.Prepare("DELETE from heroes where id=?")
 		if err != nil {
 			log.Panic(err)
@@ -369,11 +369,11 @@ func StartGin() {
 			log.Panic(err)
 		}
 
-		fmt.Println(affect)
+		//fmt.Println(affect)
 		if err != nil {
 			log.Panic(err)
 		}
-		log.Println("Deleting id " + c.Param("id"))
+		//log.Println("Deleting id " + c.Param("id"))
 		/*
 			c.JSON(http.StatusOK, gin.H{
 				"status": "1",
