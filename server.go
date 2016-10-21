@@ -61,7 +61,7 @@ func OpenDb() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer Db.Close()
+	//defer Db.Close()
 	rows, err1 := Db.Query("select count(*) from heroes")
 	if err1 != nil {
 		//log.Fatal(err)
