@@ -43,14 +43,16 @@ func main() {
 //InitDb intialize databases
 func InitDb() {
 	var err error
-	var f *os.File
+	/*
+		var f *os.File
 
-	f, err = os.OpenFile("logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		//fmt.fprintln("error opening file: %v", err)
-		fmt.Printf("%v\n", err)
-	}
-	defer f.Close()
+		f, err = os.OpenFile("logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+		if err != nil {
+			//fmt.fprintln("error opening file: %v", err)
+			fmt.Printf("%v\n", err)
+		}
+		defer f.Close()
+	*/
 
 	//log.SetOutput(f)
 	log.SetOutput(os.Stdout)

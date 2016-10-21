@@ -1,3 +1,3 @@
 FROM scratch
-ADD server.exe /
+ADD server.exe /server.exe
 CMD ["/server.exe"]
