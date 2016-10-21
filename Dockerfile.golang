@@ -1,0 +1,11 @@
+FROM golang:alpine
+ENTRYPOINT ["/bin/server"]
+
+COPY . /go/src/github.com/traderboy/gorest
+RUN export GOPATH=/go \
+    && cd /go/src/github.com/traderboy/gorest \
+    && ls \
+	&& go install github.com/gin-gonic/gin \
+	&& go install github.com/mattn/go-sqlite3 \
+	&& go build -ldflags "-s" -o /bin/server \
+	&& rm -rf /go \

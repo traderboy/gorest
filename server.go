@@ -34,11 +34,9 @@ func main() {
 	sqliteParam := flag.Bool("sqlite", false, "a bool")
 
 	if *logParam {
-
 		InitLog()
 		log.Println("Writing log file to : logfile.txt")
 	} else {
-
 		log.SetOutput(os.Stdout)
 		log.Println("Writing log file to stdOut")
 	}
@@ -56,7 +54,6 @@ func main() {
 
 func OpenDb() {
 	var err error
-
 	Db, err = sql.Open("sqlite3", "./heroes.sqlite")
 	if err != nil {
 		log.Fatal(err)
@@ -69,7 +66,6 @@ func OpenDb() {
 		return
 	}
 	defer rows.Close()
-
 }
 
 func InitLog() {
