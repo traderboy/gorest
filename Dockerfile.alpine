@@ -6,7 +6,7 @@ COPY . /go/src/github.com/traderboy/gorest
 RUN apk-install -t build-deps build-base go git \
 	&& cd /go/src/github.com/traderboy/gorest \
 	&& export GOPATH=/go \
-	&& go -v get \
-	&& go -v build -ldflags "-X main.Version=$(cat VERSION)" -o /bin/server \
+	&& go get \
+	&& go build -v -ldflags "-X main.Version=$(cat VERSION)" -o /bin/server \
 	&& rm -rf /go \
 	&& apk del --purge build-deps
