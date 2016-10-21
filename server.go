@@ -11,7 +11,6 @@ import (
 	"os"
 	"runtime"
 	"strconv"
-
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	//"github.com/garyburd/redigo/redis"
@@ -36,12 +35,21 @@ type Person struct {
 
 func main() {
 	InitDb()
+	//LoadDb()
 	ConfigRuntime()
 	StartGin()
 }
-
-//InitDb intialize databases
 func InitDb() {
+	var err error
+	Db, err := sql.Open("sqlite3", "./heroes.sqlite")
+	if err != nil {
+		log.Fatal(err)
+
+	}
+
+}
+//LoadDb intialize databases
+func LoadDb() {
 	var err error
 	/*
 		var f *os.File
