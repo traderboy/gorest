@@ -20,7 +20,8 @@ import (
 //Db is the SQLITE database object
 var Db *sql.DB
 var port = ":8080"
-var UseStdOut = true
+
+//var UseStdOut = true
 
 //Person  is a single person
 type Person struct {
@@ -84,14 +85,13 @@ func InitLog() {
 	log.SetOutput(f)
 }
 
-//LoadDb intialize databases
+//InitDb intialize databases
 func InitDb() {
 	var err error
 	Db, err = sql.Open("sqlite3", ":memory:")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer Db.Close()
 
 }
 func LoadDb() {
