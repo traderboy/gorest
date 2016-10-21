@@ -1,3 +1,4 @@
+#not working
 FROM scratch
 ADD server.exe /server.exe
-CMD ["/server.exe"]
+ENTRYPOINT ["/server.exe"]

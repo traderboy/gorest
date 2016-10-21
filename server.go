@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -11,6 +12,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	//"github.com/garyburd/redigo/redis"
@@ -26,6 +28,7 @@ import (
 //Db is the SQLITE database object
 var Db *sql.DB
 var port = ":8080"
+var UseStdOut = true
 
 //Person  is a single person
 type Person struct {
@@ -34,37 +37,72 @@ type Person struct {
 }
 
 func main() {
-	InitDb()
-	//LoadDb()
+	logParam := flag.Bool("log", false, "a bool")
+	sqliteParam := flag.Bool("sqlite", false, "a bool")
+
+	if *logParam {
+
+		InitLog()
+		log.Println("Writing log file to : logfile.txt")
+	} else {
+
+		log.SetOutput(os.Stdout)
+		log.Println("Writing log file to stdOut")
+	}
+
+	if *sqliteParam {
+		log.Println("SQLite database in memory only")
+		InitDb()
+	} else {
+		log.Println("SQLite database on disk")
+		OpenDb()
+	}
 	ConfigRuntime()
 	StartGin()
 }
+
+func OpenDb() {
+	var err error
+	Db, err = sql.Open("sqlite3", "./heroes.sqlite")
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	rows, err := Db.Query("select count(*) from heroes")
+	if err != nil {
+		//log.Fatal(err)
+		LoadDb()
+	}
+	defer rows.Close()
+
+	//LoadDb()
+}
+
+func InitLog() {
+
+	var err error
+	var f *os.File
+	f, err = os.OpenFile("logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		//fmt.fprintln("error opening file: %v", err)
+		fmt.Printf("%v\n", err)
+	}
+	defer f.Close()
+	log.SetOutput(f)
+}
+
+//LoadDb intialize databases
 func InitDb() {
 	var err error
-	Db, err := sql.Open("sqlite3", "./heroes.sqlite")
+	Db, err = sql.Open("sqlite3", ":memory:")
 	if err != nil {
 		log.Fatal(err)
 
 	}
 
 }
-//LoadDb intialize databases
 func LoadDb() {
 	var err error
-	/*
-		var f *os.File
-
-		f, err = os.OpenFile("logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-		if err != nil {
-			//fmt.fprintln("error opening file: %v", err)
-			fmt.Printf("%v\n", err)
-		}
-		defer f.Close()
-	*/
-
-	//log.SetOutput(f)
-	log.SetOutput(os.Stdout)
-
 	var strs = `[{ "id": 11, "name": "Mr. Nice" },
 { "id": 12, "name": "Narco" },
 { "id": 13, "name": "Bombasto" },
@@ -95,11 +133,6 @@ func LoadDb() {
 
 	//log.Println("Creating SQLite Db", "Log")
 	//Db, err := sql.Open("sqlite3", "./foo.Db")
-	Db, err = sql.Open("sqlite3", ":memory:")
-	if err != nil {
-		log.Fatal(err)
-
-	}
 	//defer Db.Close()
 
 	sqlStmt := `
