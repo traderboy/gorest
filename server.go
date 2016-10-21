@@ -149,7 +149,6 @@ func ConfigRuntime() {
 		fmt.Println(err)
 	}
 	fmt.Println("Public IP: " + ip)
-
 }
 
 func externalIP() (string, error) {
