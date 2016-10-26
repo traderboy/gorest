@@ -1,12 +1,29 @@
 FROM golang:alpine
 
-ENTRYPOINT ["/bin/server"]
-
 COPY . /go/src/github.com/traderboy/gorest
-RUN apk-install -t build-deps build-base go git \
-	&& cd /go/src/github.com/traderboy/gorest \
-	&& export GOPATH=/go \
-	&& go get \
-	&& go build -v -ldflags "-X main.Version=$(cat VERSION)" -o /bin/server \
+RUN apk add --update build-base go git
+
+# Set up GOPATH
+#RUN mkdir /go
+ENV GOPATH /go
+RUN go get github.com/gin-gonic/gin \
+    && go get github.com/mattn/go-sqlite3
+
+RUN go build -v -o /bin/server /go/src/github.com/traderboy/gorest/server.go \ 
 	&& rm -rf /go \
-	&& apk del --purge build-deps
+	&& apk del --purge build-base \ 
+	&& apk del --purge git 
+
+
+
+#RUN apk-install -t build-deps build-base go git \
+#	&& cd /go/src/github.com/traderboy/gorest \
+#	&& export GOPATH=/go \
+#	&& go get \
+#	&& go build -v -ldflags "-X main.Version=$(cat VERSION)" -o /bin/server \
+#	&& rm -rf /go \
+#	&& apk del --purge build-deps
+
+ENTRYPOINT ["/bin/server"]
+# Expose where the application wants to listen
+EXPOSE 8080

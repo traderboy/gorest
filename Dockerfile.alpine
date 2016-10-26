@@ -1,12 +1,19 @@
-FROM gliderlabs/alpine:3.3
+#docker build -t gorestserver -f Dockerfile.alpine .
+#docker run --rm -it -p 8080:8080  gorestserver
 
-ENTRYPOINT ["/bin/server"]
-
+FROM gliderlabs/alpine:3.4
 COPY . /go/src/github.com/traderboy/gorest
-RUN apk-install -t build-deps build-base go git \
+RUN apk add --update --no-cache  --virtual .build-dependencies  build-base go git \
 	&& cd /go/src/github.com/traderboy/gorest \
 	&& export GOPATH=/go \
 	&& go get \
 	&& go build -v -ldflags "-X main.Version=$(cat VERSION)" -o /bin/server \
 	&& rm -rf /go \
-	&& apk del --purge build-deps
+	&& apk del .build-dependencies \
+	&& apk del --purge git go build-base
+
+
+#&& apk del --purge build-base git go build-deps
+
+ENTRYPOINT ["/bin/server"]
+EXPOSE 8080	
