@@ -1,9 +1,0 @@
-#requires server to be build using Dockerfile.alpine
-#docker build -t gorestserver -f Dockerfile.alpine_bare .
-#docker run --rm -it -p 8080:8080  gorestserver
-
-FROM busybox
-COPY server /server
-ENTRYPOINT ["/bin/server"]
-
-EXPOSE 8080	
