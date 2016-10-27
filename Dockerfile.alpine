@@ -10,7 +10,8 @@ RUN apk add --update --no-cache  --virtual .build-dependencies  build-base go gi
 	&& go build -v -ldflags "-X main.Version=$(cat VERSION)" -o /bin/server \
 	&& rm -rf /go \
 	&& apk del .build-dependencies \
-	&& apk del --purge git go build-base
+	&& apk del --purge git go build-base \
+	&& rm -rf /var/cache/apk/*
 
 
 #&& apk del --purge build-base git go build-deps

@@ -3,7 +3,8 @@
 #docker run --rm -it -p 8080:8080  gorestserver
 
 #FROM busybox:musl
-FROM busybox:latest
+#FROM busybox:latest
+FROM busybox:glibc
 COPY server /server
 ENTRYPOINT ["/server"]
 

@@ -1,8 +1,8 @@
 #requires server to be build using Dockerfile.alpine
-#docker build -t gorestserver -f Dockerfile.alpine_bare .
-#docker run --rm -it -p 8080:8080  gorestserver
+#docker build -t staticgorestserver -f Dockerfile.alpine_bare .
+#docker run --rm -it -p 8080:8080  staticgorestserver
 
 FROM gliderlabs/alpine:3.4
 COPY server /bin
 ENTRYPOINT ["/bin/server"]
-EXPOSE 8080	
+EXPOSE 8080
