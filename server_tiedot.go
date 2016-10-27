@@ -1,8 +1,8 @@
 package main
 
 import (
-	"database/sql"
-	"encoding/json"
+	//"database/sql"
+	//"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -11,16 +11,20 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"strconv"
+	//"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/HouzuoGuo/tiedot/db"
 )
 
 //Db is the SQLITE database object
-var Db *sql.DB
+//var Db *sql.DB
+//var Db *DB
+//Db,err := db.OpenDB("heroes")
+//Db,err := db.OpenDB("heroes")
 var port = ":8080"
-
+var Db *db.DB
+var heroes *db.Col
 //var UseStdOut = true
 
 //Person  is a single person
@@ -61,8 +65,24 @@ func OpenDb() {
 		log.Fatal(err)
 	}
 	//defer Db.Close()
-  if err = myDB.Create("Heroes"); err == nil {
-		LoadDb()
+  if err = Db.Create("Heroes"); err == nil {
+    fmt.Println("Initializing database")
+    //Db.Create("Heroes")
+    //Db.Use("Heroes")
+    heroes = Db.Use("Heroes")
+heroes.Insert(map[string]interface{}{ "id": 11, "name": "Mr. Nice" })
+heroes.Insert(map[string]interface{}{ "id": 12, "name": "Narco" })
+heroes.Insert(map[string]interface{}{ "id": 13, "name": "Bombasto" })
+heroes.Insert(map[string]interface{}{ "id": 14, "name": "Celeritas" })
+heroes.Insert(map[string]interface{}{ "id": 15, "name": "Magneta" })
+heroes.Insert(map[string]interface{}{ "id": 16, "name": "RubberMan" })
+heroes.Insert(map[string]interface{}{ "id": 17, "name": "Dynama" })
+heroes.Insert(map[string]interface{}{ "id": 18, "name": "Dr IQ" })
+heroes.Insert(map[string]interface{}{ "id": 19, "name": "Magma" })
+heroes.Insert(map[string]interface{}{ "id": 20, "name": "Tornado" })
+
+
+		//LoadDb()
 	}
 }
 
@@ -80,6 +100,7 @@ func InitLog() {
 }
 
 //InitDb intialize databases
+
 func InitDb() {
 	var err error
 	//Db, err = sql.Open("sqlite3", ":memory:")
@@ -87,80 +108,26 @@ func InitDb() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	Db.Use("Heroes")
 
 }
+
+
 func LoadDb() {
-	var err error
-	var strs = `[{ "id": 11, "name": "Mr. Nice" },
-{ "id": 12, "name": "Narco" },
-{ "id": 13, "name": "Bombasto" },
-{ "id": 14, "name": "Celeritas" },
-{ "id": 15, "name": "Magneta" },
-{ "id": 16, "name": "RubberMan" },
-{ "id": 17, "name": "Dynama" },
-{ "id": 18, "name": "Dr IQ" },
-{ "id": 19, "name": "Magma" },
-{ "id": 20, "name": "Tornado" }]`
+heroes := Db.Use("Heroes")
+heroes.Insert(map[string]interface{}{ "id": 11, "name": "Mr. Nice" })
+heroes.Insert(map[string]interface{}{ "id": 12, "name": "Narco" })
+heroes.Insert(map[string]interface{}{ "id": 13, "name": "Bombasto" })
+heroes.Insert(map[string]interface{}{ "id": 14, "name": "Celeritas" })
+heroes.Insert(map[string]interface{}{ "id": 15, "name": "Magneta" })
+heroes.Insert(map[string]interface{}{ "id": 16, "name": "RubberMan" })
+heroes.Insert(map[string]interface{}{ "id": 17, "name": "Dynama" })
+heroes.Insert(map[string]interface{}{ "id": 18, "name": "Dr IQ" })
+heroes.Insert(map[string]interface{}{ "id": 19, "name": "Magma" })
+heroes.Insert(map[string]interface{}{ "id": 20, "name": "Tornado" })
 
-	//fmt.Fprintln(os.Stderr, "hello world")
-	//os.Stdout.Write([]byte(strs))
-	//os.Stdout.WriteString("\n")
-	//fmt.Println("hello world")
+//heroes.Insert(map[string]interface{}{"Title": "New Go release", "Source": "golang.org", "Age": 3})
 
-	//var vals []Person
-	vals := make([]Person, 0)
-	json.Unmarshal([]byte(strs), &vals)
-
-	//err := os.Remove("./foo.Db")
-
-	//if err != nil {
-	//fmt.Println(err)
-	//fmt.Println("Creating SQLite Db", "Log")
-	//return
-	//}
-
-	//log.Println("Creating SQLite Db", "Log")
-	//Db, err := sql.Open("sqlite3", "./foo.Db")
-	//defer Db.Close()
-
-	sqlStmt := `
-	create table heroes (id INTEGER PRIMARY KEY AUTOINCREMENT, name text);
-	delete from heroes;
-	`
-	//log.Println("Executing SQLite Db", "Log")
-	_, err = Db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-		return
-	}
-	//log.Println("1", "Log")
-	tx, err := Db.Begin()
-	if err != nil {
-		log.Fatal(err)
-	}
-	stmt, err := tx.Prepare("insert into heroes(id, name) values(?, ?)")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer stmt.Close()
-	for _, k := range vals {
-		//os.Stdout.WriteString(strconv.Itoa(k.Id) + ", " + k.Name + "\n")
-		//log.Println(strconv.Itoa(k.ID) + ", " + k.Name + "\n")
-		_, err = stmt.Exec(k.ID, fmt.Sprintf("%s", k.Name))
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	/*
-		for i := 0; i < 100; i++ {
-			_, err = stmt.Exec(i, fmt.Sprintf("ROW %d", i))
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-	*/
-	tx.Commit()
 }
 
 //ConfigRuntime print out configuration details
@@ -222,7 +189,32 @@ func externalIP() (string, error) {
 //func postHeroes(c *gin.Context) {
 //	fmt.Println("Posting heroes")
 //}
+
 func getHeroes(c *gin.Context) {
+//heroes := Db.Use("Heroes")
+// Evaluate the query
+query := "all"
+queryResult := make(map[int]struct{})
+if err := db.EvalQuery(query, heroes, &queryResult); nil != err {
+    log.Fatal(err)
+}
+//var lst = []interface{}
+var lst []interface{}
+//make(map[string]interface{}
+// Fetch the results
+for id := range queryResult {
+    readBack, err := heroes.Read(id)
+    if nil != err {
+        panic(err)
+    }
+    fmt.Printf("Query returned document %v\n", readBack)
+    lst = append(lst,readBack)
+}
+c.JSON(http.StatusOK, lst)
+
+
+/*
+
 	rows, err := Db.Query("select id, name from heroes")
 	if err != nil {
 		log.Fatal(err)
@@ -253,6 +245,7 @@ func getHeroes(c *gin.Context) {
 	//log.Println(string(str[:]))
 	//fmt.Fprintln(c, string(str))
 	c.JSON(http.StatusOK, heroes)
+	*/
 }
 
 //StartGin starts up gin and sets the routes
@@ -325,7 +318,7 @@ func StartGin() {
 		c.Header("Access-Control-Allow-Headers",
 			"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 		c.Header("Content-Type", "application/json")
-
+/*
 		var req json.RawMessage
 		if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
 			log.Panic(err)
@@ -361,13 +354,15 @@ func StartGin() {
 		if err != nil {
 			log.Panic(err)
 		}
+		*/
 		/*
 			c.JSON(http.StatusOK, gin.H{
 				"status":  "1",
 				"message": "OK",
 			})
 		*/
-		getHeroes(c)
+		//getHeroes(c)
+		
 	})
 	router.PUT("/heroes/:id", func(c *gin.Context) {
 		fmt.Println("Put")
@@ -376,6 +371,7 @@ func StartGin() {
 		c.Header("Access-Control-Allow-Headers",
 			"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 		c.Header("Content-Type", "application/json")
+		/*
 		var req json.RawMessage
 		//var error error
 		if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
@@ -417,6 +413,7 @@ func StartGin() {
 		if err != nil {
 			log.Panic(err)
 		}
+		*/
 		//log.Println("Updating id " + strconv.Itoa(hero.ID))
 		/*
 			c.JSON(http.StatusOK, gin.H{
@@ -424,7 +421,7 @@ func StartGin() {
 				"id":     c.Param("id"),
 			})
 		*/
-		getHeroes(c)
+		//getHeroes(c)
 	})
 
 	router.DELETE("/heroes/:id", func(c *gin.Context) {
@@ -434,7 +431,7 @@ func StartGin() {
 		c.Header("Access-Control-Allow-Headers",
 			"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 		c.Header("Content-Type", "application/json")
-
+/*
 		log.Println("Deleting id: " + c.Param("id"))
 		stmt, err := Db.Prepare("DELETE from heroes where id=?")
 		if err != nil {
@@ -457,6 +454,7 @@ func StartGin() {
 		if err != nil {
 			log.Panic(err)
 		}
+		*/
 		//log.Println("Deleting id " + c.Param("id"))
 		/*
 			c.JSON(http.StatusOK, gin.H{
@@ -464,7 +462,7 @@ func StartGin() {
 				"id":     c.Param("id"),
 			})
 		*/
-		getHeroes(c)
+		//getHeroes(c)
 	})
 
 	/*
